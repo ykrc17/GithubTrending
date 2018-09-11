@@ -1,0 +1,93 @@
+<template>
+    <!-- template里只能有一个根节点 -->
+    <div class="container">
+        <text class="title">
+            {{text}}
+        </text>
+    </div>
+</template>
+
+<style>
+    .container {
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+</style>
+
+<script>
+    import { fetch } from '@system.fetch'
+    import { Parser } from 'htmlparser2'
+
+    var $
+    const parser = new Parser({
+        items: [],
+        listStart: false,
+        nameStart: false,
+        descStart: false,
+        onopentag(name, attributes) {
+            if (name == "ol" && attributes.class == "repo-list") {
+                this.listStart = true
+            } else if (this.listStart) {
+                if (name == "li" && attributes.class == "col-12 d-block width-full py-4 border-bottom") {
+                    this.items.push({})
+                } else if (name == "h3") {
+                    this.nameStart = true
+                } else if (name == "a" && this.nameStart) {
+                    this.items[this.items.length - 1].name = attributes.href
+                } else if (name == "p" && attributes.class == "col-9 d-inline-block text-gray m-0 pr-4") {
+                    this.descStart = true
+                }
+            }
+        },
+        ontext(text) {
+            if (this.descStart) {
+                this.items[this.items.length - 1].desc = text.trim()
+            }
+        },
+        onclosetag(name) {
+            if (name == "ol") {
+                this.listStart = false
+            } else if (name == "h3") {
+                this.nameStart = false
+            } else if (name == "p") {
+                this.descStart = false
+            }
+        },
+        onend() {
+            $.text = JSON.stringify(this.items[0])
+        }
+    })
+
+    module.exports = {
+        data: {
+            text: 'World'
+        },
+        onInit() {
+            $ = this
+            $.$page.setTitleBar({
+                text: 'menu',
+                textColor: '#ffffff',
+            })
+            $.fetchTrending()
+        },
+        fetchTrending() {
+            $.text = "read"
+            fetch({
+                url: "https://github.com/trending",
+                success(response) {
+                    parser.write(response.data)
+                    parser.end()
+                },
+                fail(err, code) {
+                    $.text = JSON.stringify(err)
+                }
+            })
+        }
+    }
+</script>
