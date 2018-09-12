@@ -19,10 +19,10 @@
     "logLevel": "log"
   },
   "router": {
-    "entry": "GT",
+    "entry": "Home",
     "pages": {
-      "GT": {
-        "component": "gt",
+      "Home": {
+        "component": "index",
         "path": "/"
       }
     }
@@ -30,7 +30,7 @@
   "display": {
     "backgroundColor": "#fbf9fe",
     "titleBar": true,
-    "titleBarBackgroundColor": "#007DFF",
+    "titleBarBackgroundColor": "#24292e",
     "titleBarTextColor": "#ffffff",
     "menu": true
   }
