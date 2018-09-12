@@ -1,0 +1,34 @@
+<template>
+    <div>
+        <text>{{text}}</text>
+    </div>
+</template>
+
+<style></style>
+
+<script>
+    import { fetch } from '@system.fetch'
+    var $
+    module.exports = {
+        protected: {
+            fullName: ""
+        },
+        private: {
+            text: ""
+        },
+        onInit() {
+            $ = this
+            $.$page.setTitleBar({ text: $.fullName })
+            fetch({
+                url: `https://api.github.com/repos/${$.fullName}`,
+                success(response) {
+                    console.log(response)
+                    $.text = response.data
+                },
+                fail(err, code) {
+                    console.log(err)
+                }
+            })
+        },
+    }
+</script>

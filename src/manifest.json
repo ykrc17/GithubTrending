@@ -7,6 +7,9 @@
   "minPlatformVersion": 1000,
   "features": [
     {
+      "name": "system.router"
+    },
+    {
       "name": "system.fetch"
     }
   ],
@@ -22,8 +25,12 @@
     "entry": "Home",
     "pages": {
       "Home": {
-        "component": "index",
+        "component": "home",
         "path": "/"
+      },
+      "Repo": {
+        "component": "repo",
+        "path": "/repo"
       }
     }
   },
