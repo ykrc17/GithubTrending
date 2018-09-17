@@ -1,5 +1,13 @@
 <template>
-    <div class="container">
+    <div class="col">
+        <div class="row">
+            <select @change="onLanguageChanged">
+                <option for="languageSelect" value="{{$item.value}}" selected="false">{{$item.text}}</option>
+            </select>
+            <select @change="onSinceChanged">
+                <option for="sinceSelect" value="{{$item.value}}" selected="false">{{$item.text}}</option>
+            </select>
+        </div>
         <list>
             <list-item for="repoList" class="list-item" type="repo" @click="openRepo($item.fullName)">
                 <text>{{$item.fullName}}</text>
@@ -10,8 +18,15 @@
 </template>
 
 <style>
-    .container {
+    .col {
         flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+    }
+
+    .row {
+        flex-direction: row;
         justify-content: center;
         align-content: center;
         align-items: center;
@@ -66,12 +81,36 @@
         },
         onend() {
             $.repoList = this.items
+            this.items = []
         }
     })
 
+    var language = ""
+    var since = "daily"
+
     module.exports = {
         private: {
-            repoList: []
+            repoList: [],
+            languageSelect: [{
+                text: "All languages",
+                value: ""
+            }, {
+                text: "Java",
+                value: "java"
+            }, {
+                text: "Kotlin",
+                value: "kotlin"
+            }],
+            sinceSelect: [{
+                text: "today",
+                value: "daily"
+            }, {
+                text: "this week",
+                value: "weekly"
+            }, {
+                text: "this month",
+                value: "monthly"
+            }]
         },
         onInit() {
             $ = this
@@ -82,9 +121,10 @@
             $.fetchTrending()
         },
         fetchTrending() {
+            $.repoList = []
             var startTime = new Date().getTime()
             fetch({
-                url: "https://github.com/trending",
+                url: `https://github.com/trending/${language}?since=${since}`,
                 success(response) {
                     var currentTime = new Date().getTime()
                     console.log(`download time: ${currentTime - startTime}ms`)
@@ -102,9 +142,20 @@
         },
         openRepo(fullName) {
             router.push({
-                uri: '/repo',
-                params: { fullName: fullName }
+                uri: `https://github.com/${fullName}/blob/master/README.md`
             })
+            // router.push({
+            //     uri: '/repo',
+            //     params: { fullName: fullName }
+            // })
+        },
+        onLanguageChanged(value) {
+            language = value.newValue
+            $.fetchTrending()
+        },
+        onSinceChanged(value) {
+            since = value.newValue
+            $.fetchTrending()
         }
     }
 </script>
